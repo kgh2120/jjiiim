@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'jacoco'
 }
 
 group = 'com.kk'
@@ -44,9 +45,81 @@ dependencies {
 tasks.named('test') {
     outputs.dir snippetsDir
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport' // 이거 붙히니까 이제 Jacoco 통과 못하면 빌드 실패.
 }
 
 tasks.named('asciidoctor') {
     inputs.dir snippetsDir
     dependsOn test
+}
+
+
+// jacoco Area
+jacoco {
+    toolVersion = '0.8.8'
+}
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.enabled true
+        xml.enabled false
+        csv.enabled false
+    }
+    afterEvaluate { // report에서 제외함. 안보여주기만 하는 것.
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    'com/kk/jjiiim/JjiiimApplication.class'
+            ])
+        }))
+    }
+
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    afterEvaluate { // verify에서 제외함. 퍼센티지에서 제거함.
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+            'com/kk/jjiiim/JjiiimApplication.class'
+            ])
+        }))
+    }
+    violationRules {
+        rule {
+            // 룰을 간단히 켜고 끌 수 있다.
+            enabled = true
+            // 룰을 체크할 단위는 클래스 단위
+            element = 'CLASS'
+            // 브랜치 커버리지를 최소한 90% 만족시켜야 한다.
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.90
+            }
+            // 라인 커버리지를 최소한 80% 만족시켜야 한다.
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+            // 빈 줄을 제외한 코드의 라인수를 최대 200라인으로 제한한다.
+            limit {
+                counter = 'LINE'
+                value = 'TOTALCOUNT'
+                maximum = 200
+            }
+        }
+    }
+}
+
+task testCoverage(type: Test) {
+    group 'verification'
+    description 'Runs the unit tests with coverage'
+
+    dependsOn(':test',
+            ':jacocoTestReport',
+            ':jacocoTestCoverageVerification')
+
+    tasks['jacocoTestReport'].mustRunAfter(tasks['test'])
+    tasks['jacocoTestCoverageVerification'].mustRunAfter(tasks['jacocoTestReport'])
 }
