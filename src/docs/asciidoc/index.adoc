@@ -1,0 +1,22 @@
+= jjiiim! API DOCS
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs // 문서에 표기되는 코드들의 하이라이팅을 highlightjs를 사용
+:toc: left // toc (Table Of Contents)를 문서의 좌측에 두기
+:toclevels: 2
+:sectlinks:
+
+// 하단은 Sample Code
+// [[Member-API]]
+// == Member API
+//
+//
+//
+//
+// [[Member-생성]]
+// === Member 생성
+// operation::users/createUser[snippets='http-request,path-parameters,http-response,response-fields']
+//
+// [[Member-ID조회]]
+// === Member ID 조회
+// operation::users/find[snippets='http-request,path-parameters,http-response,response-fields']
