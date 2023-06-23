@@ -10,11 +10,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.UUID;
 
 import static com.kk.jjiiim.exception.CommonErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,6 +30,9 @@ class ManagerServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private ManagerService managerService;
@@ -45,6 +52,8 @@ class ManagerServiceTest {
                 .willReturn(false);
         given(userRepository.existsByPhoneNumber(any()))
                 .willReturn(false);
+//        given(passwordEncoder.encode(anyString()))
+//                .willReturn(UUID.randomUUID().toString());
         //when //then
         assertThatNoException()
                 .isThrownBy(() -> managerService.signUp(request));

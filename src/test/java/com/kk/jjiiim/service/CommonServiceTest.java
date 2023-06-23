@@ -1,18 +1,21 @@
 package com.kk.jjiiim.service;
 
+import com.kk.jjiiim.domain.Customer;
 import com.kk.jjiiim.dto.CheckId;
 import com.kk.jjiiim.dto.CheckPhoneNumber;
+import com.kk.jjiiim.exception.CommonApiException;
 import com.kk.jjiiim.repository.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -24,6 +27,12 @@ class CommonServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Mock
+    private ValueOperations ops;
 
     @InjectMocks
     private CommonService commonService;
@@ -89,6 +98,59 @@ class CommonServiceTest {
         //then
         assertThat(response.isResult())
                 .isTrue();
+    }
+
+    @DisplayName("아이디로 조회하기 - [성공]")
+    @Test
+    void loadByUsername_SUCCESS () throws Exception{
+        final String loginId = "foobar";
+        final String password = "foobar";
+        Customer customer = Customer.builder()
+                .loginId(loginId)
+                .password(password)
+                .build();
+        //given
+        given(userRepository.findByLoginId(anyString()))
+                .willReturn(Optional.of(customer));
+        //when
+        UserDetails finded = commonService.loadUserByUsername(loginId);
+        //then
+        assertThat(finded.getUsername()).isEqualTo(loginId);
+        assertThat(finded.getPassword()).isEqualTo(password);
+    }
+    @DisplayName("아이디로 조회하기 - [실패] 아이디가 존재하지 않습니다.")
+    @Test
+    void loadByUsername_FAIL_ID_NOT_FOUND () throws Exception{
+        final String loginId = "foobar";
+        CommonApiException occurredException = CommonApiException.loginIdNotFound();
+        //given
+        given(userRepository.findByLoginId(anyString()))
+                .willReturn(Optional.empty());
+        //when
+        assertThatThrownBy(() -> commonService.loadUserByUsername(loginId))
+                .isInstanceOf(CommonApiException.class)
+                .hasFieldOrPropertyWithValue("errorName",occurredException.getErrorName())
+                .hasFieldOrPropertyWithValue("errorMessage",occurredException.getErrorMessage());
+    }
+
+
+    @DisplayName("리프래시 토큰 저장 - [성공]")
+    @Test
+    void saveRefreshToken_SUCCESS () throws Exception{
+        //given
+        final String username = "username";
+        final String refreshToken = "refreshToken";
+
+
+        given(stringRedisTemplate.opsForValue())
+                .willReturn(ops);
+
+        //when //then
+        assertThatNoException()
+                .isThrownBy(() -> commonService.saveRefreshToken(username,refreshToken));
+
+
+
     }
 
 }

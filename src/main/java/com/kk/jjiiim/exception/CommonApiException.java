@@ -16,4 +16,8 @@ public class CommonApiException extends AbstractApiException{
     public static CommonApiException passwordUnMatched(){
         return new CommonApiException(PASSWORD_UN_MATCHED);
     }
+    public static CommonApiException loginIdNotFound(){
+        return new CommonApiException(LOGIN_ID_NOT_FOUND);
+    }
+
 }

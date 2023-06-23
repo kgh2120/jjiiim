@@ -4,13 +4,13 @@ import com.kk.jjiiim.domain.Customer;
 import com.kk.jjiiim.domain.Manager;
 import com.kk.jjiiim.domain.Role;
 import com.kk.jjiiim.dto.SignUp;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserCreateFactory {
-
-    private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    public static Customer createCustomer(SignUp.Request userInfo) {
+    public static Customer createCustomer(SignUp.Request userInfo, PasswordEncoder passwordEncoder) {
         return Customer.builder()
                 .loginId(userInfo.getLoginId())
                 .password(passwordEncoder.encode(userInfo.getPassword()))
@@ -19,7 +19,7 @@ public class UserCreateFactory {
                 .build();
     }
 
-    public static Manager createManager(SignUp.Request userInfo) {
+    public static Manager createManager(SignUp.Request userInfo,PasswordEncoder passwordEncoder) {
         return Manager.builder()
                 .loginId(userInfo.getLoginId())
                 .password(passwordEncoder.encode(userInfo.getPassword()))

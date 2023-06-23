@@ -18,6 +18,7 @@ import java.util.List;
 @Entity
 public class Manager extends User{
 
+    @Builder.Default
     @OneToMany(mappedBy = "manager")
     List<Store> stores = new ArrayList<>();
 }
