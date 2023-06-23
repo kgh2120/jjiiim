@@ -18,3 +18,18 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+#  data:
+#    redis:
+#      pool
+#      pool:
+#
+#        min-idle: 0
+#        max-idle: 8
+#        max-active: 8
+
+
