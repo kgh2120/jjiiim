@@ -2,6 +2,7 @@ package com.kk.jjiiim.controller;
 
 
 import com.kk.jjiiim.dto.CheckId;
+import com.kk.jjiiim.dto.CheckPhoneNumber;
 import com.kk.jjiiim.dto.RequestCode;
 import com.kk.jjiiim.service.CommonService;
 import jakarta.validation.Valid;
@@ -23,6 +24,11 @@ public class CommonController {
     @PostMapping("/id")
     public ResponseEntity<CheckId.Response> checkDuplicateId(@RequestBody @Valid  CheckId.Request dto){
         return ResponseEntity.ok(commonService.isDuplicatedId(dto));
+    }
+
+    @PostMapping("/phone")
+    public ResponseEntity<CheckPhoneNumber.Response> checkDuplicatePhoneNumber(@RequestBody @Valid  CheckPhoneNumber.Request dto){
+        return ResponseEntity.ok(commonService.isDuplicatedPhoneNumber(dto));
     }
 
 }

@@ -3,6 +3,7 @@ package com.kk.jjiiim.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kk.jjiiim.config.SecurityConfig;
 import com.kk.jjiiim.dto.CheckId;
+import com.kk.jjiiim.dto.CheckPhoneNumber;
 import com.kk.jjiiim.exception.CommonErrorCode;
 import com.kk.jjiiim.service.CommonService;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs(uriScheme = "http", uriHost = "localhost/docs", uriPort = 8080)
 class CommonControllerTest {
 
-    public static final String IS_DUPLICATE_ID = "/common/id";
+    private static final String IS_DUPLICATE_ID = "/common/id";
+    private static final String IS_DUPLICATE_PHONE_NUMBER = "/common/phone";
     @Autowired
     private MockMvc mockMvc;
 
@@ -90,7 +92,7 @@ class CommonControllerTest {
     void isDuplicatedId_FAIL_ID_BLANK () throws Exception{
         //given
         CheckId.Request request = new CheckId.Request("");
-        CommonErrorCode occuredError = CommonErrorCode.INVALID_INPUT;
+        CommonErrorCode occurredError = CommonErrorCode.INVALID_INPUT;
         //when
         mockMvc.perform(post(IS_DUPLICATE_ID)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -98,9 +100,9 @@ class CommonControllerTest {
                 .andDo(print())
                 //then
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorCode").value(occuredError.getErrorCode()))
-                .andExpect(jsonPath("$.errorName").value(occuredError.getErrorName()))
-                .andExpect(jsonPath("$.errorMessage").value(occuredError.getErrorMessage()))
+                .andExpect(jsonPath("$.errorCode").value(occurredError.getErrorCode()))
+                .andExpect(jsonPath("$.errorName").value(occurredError.getErrorName()))
+                .andExpect(jsonPath("$.errorMessage").value(occurredError.getErrorMessage()))
                 .andExpect(jsonPath("$.path").value(IS_DUPLICATE_ID));
     }
     @DisplayName("아이디 중복 검사 - [실패] ID 입력 안함")
@@ -108,7 +110,7 @@ class CommonControllerTest {
     void isDuplicatedId_FAIL_ID_NULL () throws Exception{
         //given
         CheckId.Request request = new CheckId.Request(null);
-        CommonErrorCode occuredError = CommonErrorCode.INVALID_INPUT;
+        CommonErrorCode occurredError = CommonErrorCode.INVALID_INPUT;
         //when
         mockMvc.perform(post(IS_DUPLICATE_ID)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -116,10 +118,90 @@ class CommonControllerTest {
                 .andDo(print())
                 //then
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorCode").value(occuredError.getErrorCode()))
-                .andExpect(jsonPath("$.errorName").value(occuredError.getErrorName()))
-                .andExpect(jsonPath("$.errorMessage").value(occuredError.getErrorMessage()))
+                .andExpect(jsonPath("$.errorCode").value(occurredError.getErrorCode()))
+                .andExpect(jsonPath("$.errorName").value(occurredError.getErrorName()))
+                .andExpect(jsonPath("$.errorMessage").value(occurredError.getErrorMessage()))
                 .andExpect(jsonPath("$.path").value(IS_DUPLICATE_ID));
     }
+
+    @DisplayName("전화 번호 중복 검사 - [성공] 사용 가능")
+    @Test
+    void isDuplicatedPhoneNumber_SUCCESS_FALSE () throws Exception{
+        //given
+
+        CheckPhoneNumber.Request request = new CheckPhoneNumber.Request("010-0000-0000");
+        given(commonService.isDuplicatedPhoneNumber(request))
+                .willReturn(new CheckPhoneNumber.Response(false));
+        //when
+        mockMvc.perform(post(IS_DUPLICATE_PHONE_NUMBER)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andDo(document("/common/check-phone/false",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint())
+                ))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value(false));
+    }
+
+    @DisplayName("전화 번호 중복 검사 - [성공] 사용 불가")
+    @Test
+    void isDuplicatedPhoneNumber_SUCCESS_TRUE () throws Exception{
+        //given
+        CheckPhoneNumber.Request request = new CheckPhoneNumber.Request("010-0000-0000");
+        given(commonService.isDuplicatedPhoneNumber(request))
+                .willReturn(new CheckPhoneNumber.Response(true));
+        //when
+        mockMvc.perform(post(IS_DUPLICATE_PHONE_NUMBER)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andDo(document("/common/check-phone/true",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint())
+                ))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value(true));
+    }
+    @DisplayName("전화 번호 중복 검사 - [실패] 전화 번호 공백 입력")
+    @Test
+    void isDuplicatedPhoneNumber_FAIL_INPUT_BLANK () throws Exception{
+        //given
+        CheckPhoneNumber.Request request = new CheckPhoneNumber.Request("");
+        CommonErrorCode occurredError = CommonErrorCode.INVALID_INPUT;
+        //when
+        mockMvc.perform(post(IS_DUPLICATE_PHONE_NUMBER)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value(occurredError.getErrorCode()))
+                .andExpect(jsonPath("$.errorName").value(occurredError.getErrorName()))
+                .andExpect(jsonPath("$.errorMessage").value(occurredError.getErrorMessage()))
+                .andExpect(jsonPath("$.path").value(IS_DUPLICATE_PHONE_NUMBER));
+    }
+    @DisplayName("전화 번호 중복 검사 - [실패] 전화 번호 입력 안함")
+    @Test
+    void isDuplicatedPhoneNumber_FAIL_INPUT_NULL () throws Exception{
+        //given
+        CheckPhoneNumber.Request request = new CheckPhoneNumber.Request(null);
+        CommonErrorCode occurredError = CommonErrorCode.INVALID_INPUT;
+        //when
+        mockMvc.perform(post(IS_DUPLICATE_PHONE_NUMBER)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value(occurredError.getErrorCode()))
+                .andExpect(jsonPath("$.errorName").value(occurredError.getErrorName()))
+                .andExpect(jsonPath("$.errorMessage").value(occurredError.getErrorMessage()))
+                .andExpect(jsonPath("$.path").value(IS_DUPLICATE_PHONE_NUMBER));
+    }
+
 
 }
