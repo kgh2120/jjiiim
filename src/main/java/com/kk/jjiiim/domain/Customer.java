@@ -19,6 +19,7 @@ import java.util.List;
 @Entity
 public class Customer extends User{
 
+    @Builder.Default
     @OneToMany(mappedBy = "customer")
     private List<Reservation> reservations = new ArrayList<>();
 

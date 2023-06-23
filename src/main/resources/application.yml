@@ -1,5 +1,7 @@
 
 spring:
+  config:
+    import: secret.yml
   datasource:
     url: jdbc:h2:mem:test
     username: sa
@@ -25,6 +27,11 @@ spring:
     redis:
       port: 6379
       host: localhost
+      lettuce:
+        pool:
+          min-idle: 0
+          max-idle: 8
+          max-active: 8
 
 #  data:
 #    redis:
