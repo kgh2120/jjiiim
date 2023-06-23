@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .headers(headers ->
                         headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .sessionManagement(sessionManager -> sessionManager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(request -> request.requestMatchers("/common/**", "/user/signup", "/manager/signup").permitAll());
+                .authorizeHttpRequests(request -> request.requestMatchers("/common/**", "/customer/signup", "/manager/signup").permitAll());
 
 
 

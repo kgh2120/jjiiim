@@ -10,4 +10,10 @@ public class CommonApiException extends AbstractApiException{
     public static CommonApiException alreadyRegisteredPhoneNumber(){
         return new CommonApiException(ALREADY_REGISTERED_PHONE_NUMBER);
     }
+    public static CommonApiException alreadyRegisteredLoginId(){
+        return new CommonApiException(ALREADY_REGISTERED_LOGIN_ID);
+    }
+    public static CommonApiException passwordUnMatched(){
+        return new CommonApiException(PASSWORD_UN_MATCHED);
+    }
 }
