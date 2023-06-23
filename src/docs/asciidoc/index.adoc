@@ -7,15 +7,17 @@
 :sectlinks:
 
 // 하단은 Sample Code
-// [[Member-API]]
-// == Member API
+[[COMMON-API]]
+== COMMON-API
 //
 //
 //
 //
-// [[Member-생성]]
-// === Member 생성
-// operation::users/createUser[snippets='http-request,path-parameters,http-response,response-fields']
+[[COMMON-ID중복검사-사용가능]]
+=== ID 중복 검사-사용가능
+operation::common/check-id/false[snippets='http-request,path-parameters,http-response,response-fields'][[COMMON-ID중복검사-사용가능]]
+=== ID 중복 검사-사용불가
+operation::common/check-id/true[snippets='http-request,path-parameters,http-response,response-fields']
 //
 // [[Member-ID조회]]
 // === Member ID 조회
