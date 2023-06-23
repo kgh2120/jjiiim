@@ -87,6 +87,8 @@ jacocoTestReport {
                     'com/kk/jjiiim/config/**',
                     'com/kk/jjiiim/exception/**',
                     'com/kk/jjiiim/domain/**',
+                    'com/kk/jjiiim/repository/**',
+                    'com/kk/jjiiim/dto/**',
             ])
         }))
     }
@@ -102,13 +104,15 @@ jacocoTestCoverageVerification {
             'com/kk/jjiiim/config/**',
             'com/kk/jjiiim/exception/**',
             'com/kk/jjiiim/domain/**',
+            'com/kk/jjiiim/repository/**',
+            'com/kk/jjiiim/dto/**',
             ])
         }))
     }
     violationRules {
         rule {
             // 룰을 간단히 켜고 끌 수 있다.
-            enabled = false
+            enabled = true
             // 룰을 체크할 단위는 클래스 단위
             element = 'CLASS'
             // 브랜치 커버리지를 최소한 90% 만족시켜야 한다.
