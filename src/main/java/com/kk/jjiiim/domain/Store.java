@@ -7,12 +7,17 @@ import java.util.List;
 @Entity
 public class Store extends BaseEntity{
 
+    @Column(unique = true, updatable = false, nullable = false)
     private String name;
-    private String latitude; // TODO db에서 계산 안될 경우엔 double로 변경해야 함.
-    private String longitude;
-
+    @Column(nullable = false, updatable = false)
+    private double latitude;
+    @Column(nullable = false, updatable = false)
+    private double longitude;
+    @Column(nullable = false, updatable = false)
+    private String address;
+    @Column(nullable = false, updatable = false)
     private String description;
-
+    @Column(nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     private Category category;
 
