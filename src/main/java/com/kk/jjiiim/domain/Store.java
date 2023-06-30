@@ -1,9 +1,17 @@
 package com.kk.jjiiim.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
 @Entity
 public class Store extends BaseEntity{
 
@@ -27,4 +35,9 @@ public class Store extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "manager_id")
     private Manager manager;
+
+    public void associatedWithManager(Manager manager){
+        this.manager = manager;
+        manager.associatedWithStore(this);
+    }
 }

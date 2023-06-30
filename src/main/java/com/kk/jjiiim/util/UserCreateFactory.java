@@ -15,7 +15,7 @@ public class UserCreateFactory {
                 .loginId(userInfo.getLoginId())
                 .password(passwordEncoder.encode(userInfo.getPassword()))
                 .phoneNumber(userInfo.getPhoneNumber())
-                .role(Role.CUSTOMER)
+                .role(Role.ROLE_CUSTOMER)
                 .build();
     }
 
@@ -24,7 +24,7 @@ public class UserCreateFactory {
                 .loginId(userInfo.getLoginId())
                 .password(passwordEncoder.encode(userInfo.getPassword()))
                 .phoneNumber(userInfo.getPhoneNumber())
-                .role(Role.MANAGER)
+                .role(Role.ROLE_MANAGER)
                 .build();
     }
 }

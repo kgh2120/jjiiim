@@ -1,8 +1,14 @@
 package com.kk.jjiiim.service;
 
+import com.kk.jjiiim.domain.Category;
+import com.kk.jjiiim.domain.Manager;
+import com.kk.jjiiim.dto.RegisterStore;
 import com.kk.jjiiim.dto.SignUp;
 import com.kk.jjiiim.exception.CommonApiException;
+import com.kk.jjiiim.exception.ManagerApiException;
+import com.kk.jjiiim.exception.ManagerErrorCode;
 import com.kk.jjiiim.repository.ManagerRepository;
+import com.kk.jjiiim.repository.StoreRepository;
 import com.kk.jjiiim.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,8 +16,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.kk.jjiiim.exception.CommonErrorCode.*;
@@ -33,13 +44,24 @@ class ManagerServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private StoreRepository storeRepository;
+    @Mock
+    private SecurityContextHolder securityContextHolder;
+
+    @Mock
+    private SecurityContext securityContext;
+
+    @Mock
+    private Authentication authentication;
+
 
     @InjectMocks
     private ManagerService managerService;
 
     @DisplayName("점장 회원 가입 - [성공]")
     @Test
-    void customerSignUp_SUCCESS () throws Exception{
+    void managerSignUp_SUCCESS () throws Exception{
         //given
         SignUp.Request request = SignUp.Request.builder()
                 .loginId("loginId")
@@ -61,7 +83,7 @@ class ManagerServiceTest {
 
     @DisplayName("점장 회원 가입 - [실패] ID 중복")
     @Test
-    void customerSignUp_FAIL_DUPLICATE_ID () throws Exception{
+    void managerSignUp_FAIL_DUPLICATE_ID () throws Exception{
         //given
         SignUp.Request request = SignUp.Request.builder()
                 .loginId("loginId")
@@ -79,7 +101,7 @@ class ManagerServiceTest {
     }
     @DisplayName("점장 회원 가입 - [실패] 전화 번호 중복")
     @Test
-    void customerSignUp_FAIL_DUPLICATE_PHONE () throws Exception{
+    void managerSignUp_FAIL_DUPLICATE_PHONE () throws Exception{
         //given
         SignUp.Request request = SignUp.Request.builder()
                 .loginId("loginId")
@@ -100,7 +122,7 @@ class ManagerServiceTest {
 
     @DisplayName("점장 회원 가입 - [실패] 비밀 번호 불일치")
     @Test
-    void customerSignUp_FAIL_PASSWORD_UN_MATCH () throws Exception{
+    void managerSignUp_FAIL_PASSWORD_UN_MATCH () throws Exception{
         //given
         SignUp.Request request = SignUp.Request.builder()
                 .loginId("loginId")
@@ -117,5 +139,61 @@ class ManagerServiceTest {
         assertThatThrownBy(() -> managerService.signUp(request))
                 .isInstanceOf(CommonApiException.class)
                 .hasFieldOrPropertyWithValue("errorName", PASSWORD_UN_MATCHED.getErrorName());
+    }
+
+    @DisplayName("매장 등록 - [성공]")
+    @Test
+    void registerStore_SUCCESS  () throws Exception{
+        //given
+
+        RegisterStore.Request request = RegisterStore.Request.builder()
+                .name("김밥천국 강남점")
+                .description("김밥이 싸고 맛좋아요")
+                .address("서울특별시 서초구 강남대로 10")
+                .category(Category.KOREAN)
+                .latitude(37.482949)
+                .longitude(127.005578)
+                .build();
+
+        Manager manager = Manager.builder()
+                .build();
+        given(securityContext.getAuthentication())
+                .willReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        given(SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .willReturn(manager);
+        given(storeRepository.existsByName(anyString()))
+                .willReturn(false);
+        given(managerRepository.findById(any()))
+                .willReturn(Optional.of(manager));
+        //when
+        //then
+        assertThatNoException()
+                .isThrownBy(() -> managerService.registerStore(request));
+    }
+
+    @DisplayName("매장 등록 - [실패] 매장 명 중복")
+    @Test
+    void registerStore_FAIL_DUPLICATED_STORE_NAME  () throws Exception{
+        //given
+
+        RegisterStore.Request request = RegisterStore.Request.builder()
+                .name("김밥천국 강남점")
+                .description("김밥이 싸고 맛좋아요")
+                .address("서울특별시 서초구 강남대로 10")
+                .category(Category.KOREAN)
+                .latitude(37.482949)
+                .longitude(127.005578)
+                .build();
+
+
+        given(storeRepository.existsByName(anyString()))
+                .willReturn(true);
+
+        //when
+        //then
+        assertThatThrownBy(() -> managerService.registerStore(request))
+                .isInstanceOf(ManagerApiException.class)
+                .hasFieldOrPropertyWithValue("errorName", ManagerErrorCode.ALREADY_REGISTERED_STORE_NAME.getErrorName());
     }
 }
