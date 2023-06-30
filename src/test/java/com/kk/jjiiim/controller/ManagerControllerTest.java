@@ -3,6 +3,7 @@ package com.kk.jjiiim.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kk.jjiiim.config.SecurityConfig;
 import com.kk.jjiiim.domain.Category;
+import com.kk.jjiiim.dto.MyStores;
 import com.kk.jjiiim.dto.RegisterStore;
 import com.kk.jjiiim.dto.SignUp;
 import com.kk.jjiiim.exception.CommonApiException;
@@ -13,18 +14,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,6 +40,7 @@ class ManagerControllerTest {
 
 
     public static final String REGISTER_STORE = "/manager/store";
+    public static final String READ_MY_STORES = "/manager/store";
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -196,5 +200,25 @@ class ManagerControllerTest {
                 .andExpect(jsonPath("$.errorCode").value(occurredException.getErrorCode()))
                 .andExpect(jsonPath("$.errorMessage").value(occurredException.getErrorMessage()))
                 .andExpect(jsonPath("$.errorName").value(occurredException.getErrorName()));
+    }
+
+    @DisplayName("내 매장 조회 - [성공]")
+    @Test
+    void readMyStores_SUCCESS() throws Exception {
+        //given
+        List<MyStores> results = new ArrayList<>();
+        for (int i = 0; i < 5; i++)
+            results.add(new MyStores(Integer.toUnsignedLong(i),"가게"+i, 0.0, 0L));
+
+        given(managerService.readMyStores())
+                .willReturn(results);
+        //when then
+        mockMvc.perform(get(READ_MY_STORES)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(5))
+                .andExpect(jsonPath("$[0].id").value(0))
+                .andExpect(jsonPath("$[0].name").value("가게0"));
     }
 }

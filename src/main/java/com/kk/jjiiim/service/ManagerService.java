@@ -4,6 +4,7 @@ package com.kk.jjiiim.service;
 import com.kk.jjiiim.domain.Manager;
 import com.kk.jjiiim.domain.Store;
 import com.kk.jjiiim.domain.User;
+import com.kk.jjiiim.dto.MyStores;
 import com.kk.jjiiim.dto.RegisterStore;
 import com.kk.jjiiim.dto.SignUp;
 import com.kk.jjiiim.exception.ManagerApiException;
@@ -13,11 +14,15 @@ import com.kk.jjiiim.repository.UserRepository;
 import com.kk.jjiiim.util.SignUpValidator;
 import com.kk.jjiiim.util.UserCreateFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -61,5 +66,9 @@ public class ManagerService {
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return managerRepository.findById(user.getId())
                 .orElseThrow();
+    }
+
+    public List<MyStores> readMyStores() {
+        return storeRepository.getMyStores(getManager().getId());
     }
 }

@@ -2,6 +2,7 @@ package com.kk.jjiiim.service;
 
 import com.kk.jjiiim.domain.Category;
 import com.kk.jjiiim.domain.Manager;
+import com.kk.jjiiim.dto.MyStores;
 import com.kk.jjiiim.dto.RegisterStore;
 import com.kk.jjiiim.dto.SignUp;
 import com.kk.jjiiim.exception.CommonApiException;
@@ -10,6 +11,7 @@ import com.kk.jjiiim.exception.ManagerErrorCode;
 import com.kk.jjiiim.repository.ManagerRepository;
 import com.kk.jjiiim.repository.StoreRepository;
 import com.kk.jjiiim.repository.UserRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,10 +24,13 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.kk.jjiiim.exception.CommonErrorCode.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -196,4 +201,31 @@ class ManagerServiceTest {
                 .isInstanceOf(ManagerApiException.class)
                 .hasFieldOrPropertyWithValue("errorName", ManagerErrorCode.ALREADY_REGISTERED_STORE_NAME.getErrorName());
     }
+    @DisplayName("내 매장들 조회 - [성공]")
+    @Test
+    void readMyStores_SUCCESS  () throws Exception{
+        //given
+        List<MyStores> results = new ArrayList<>();
+        for (int i = 0; i < 2; i++)
+            results.add(new MyStores(Integer.toUnsignedLong(i),"가게"+i, 0.0, 0L));
+        given(securityContext.getAuthentication())
+                .willReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        Manager manager = Manager.builder().id(1L).build();
+        given(SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .willReturn(manager);
+        given(managerRepository.findById(any()))
+                .willReturn(Optional.of(manager));
+        given(storeRepository.getMyStores(any()))
+                .willReturn(results);
+
+
+        //when
+        List<MyStores> finded = managerService.readMyStores();
+
+        assertThat(finded.size()).isSameAs(2);
+        assertThat(finded.get(0).getId()).isEqualTo(0L);
+        assertThat(finded.get(0).getName()).isEqualTo("가게0");
+    }
+
 }
