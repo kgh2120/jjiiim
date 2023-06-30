@@ -21,4 +21,8 @@ public class Manager extends User{
     @Builder.Default
     @OneToMany(mappedBy = "manager")
     List<Store> stores = new ArrayList<>();
+
+    public void associatedWithStore(Store store){
+        this.stores.add(store);
+    }
 }

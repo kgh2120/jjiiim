@@ -2,6 +2,7 @@ package com.kk.jjiiim.config;
 
 
 import com.kk.jjiiim.config.security.*;
+import com.kk.jjiiim.domain.Role;
 import com.kk.jjiiim.service.CommonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +14,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -59,6 +59,8 @@ public class SecurityConfig {
                                 "/h2-console/**")).permitAll()
                                 .requestMatchers("/common/**",
                                         "/customer/signup", "/manager/signup").permitAll()
+                                .requestMatchers("/manager/**").hasRole(Role.ROLE_MANAGER.getRoleName())
+                                .requestMatchers("/customer/**").hasRole(Role.ROLE_CUSTOMER.getRoleName())
                                )
                 .authenticationManager(authenticationManager)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
